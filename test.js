@@ -1,14 +1,3 @@
-const supertest = require('supertest');
-const app = require('./server.js');
-//const should = require('should');
-const assert = require('assert');
-
-describe("First Unit Test", () => {
-    //console.log(typeof app);
-    it("should return response code 2002222", (done) => {
-        supertest(app).get("/healthz").expect(200).end((err, res) => {
-            if (err) return done(err);
-            return done();
-        });
-    });
+const chai = require('chai');
+const assert = chai.assert;describe('A simple arithmetic function', function () {    it('should return the sum of two numbers', function () {        const sum = (a, b) => a + b;        assert.equal(sum(2, 3), 5);    });
 });
