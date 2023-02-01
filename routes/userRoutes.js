@@ -51,6 +51,15 @@ Router.post("/v1/user", async (req, res) => {
         });
     }
 
+    //check if password is valid
+    if (password.length < 8) {
+        return res.status(400).send({
+            error: 'Bad Request: Password must be at least 8 characters'
+        });
+    }
+
+    
+
     //if user does not exist, create user
     try {
         let regex = new RegExp("[a-z0-9]+@[a-z]+.[a-z]{2,3}");
@@ -66,7 +75,7 @@ Router.post("/v1/user", async (req, res) => {
         const value2 = [first_name, last_name, hashPassword2, username];
         const results2 = await db.query(sql2, value2);
         //retreive user id
-        const sql3 = `SELECT id, first_name, last_name, account_created, account_updated FROM users WHERE username = ?`;
+        const sql3 = `SELECT id, first_name, last_name,username, account_created, account_updated FROM users WHERE username = ?`;
         const value3 = [username];
         const results3 = await db.query(sql3, value3);
         const user = results3[0];
