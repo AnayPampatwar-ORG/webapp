@@ -17,6 +17,15 @@
 - git push parth main/or go to your fork and click sync
 - git checkout -b feature_y
 
+### create a .env file with following details
+NODE_ENV = development
+PORT = 3000
+
+DB_HOST = "host"
+DB_USER = root
+DB_PASSWORD = ""
+DB_NAME = db_name
+
 ### To install dependencies and run project
 - Install node
 - Run npm init --yes
