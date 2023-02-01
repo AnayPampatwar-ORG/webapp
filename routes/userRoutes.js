@@ -223,8 +223,8 @@ Router.put('/v1/user/:userId', async (req, res) => {
             last_name
         } = req.body;
         const username2 = req.body.username;
-        const updateQuery = `UPDATE users SET first_name = ?, last_name = ?, username = ?, password = ?, account_updated = now() WHERE id = ?`;
-        const values = [first_name, last_name, username2, hashPassword, req.params.userId];
+        const updateQuery = `UPDATE users SET first_name = ?, last_name = ?,  password = ?, account_updated = now() WHERE id = ?`;
+        const values = [first_name, last_name, hashPassword, req.params.userId];
         await db.query(updateQuery, values);
 
         
