@@ -11,6 +11,10 @@ app.use(bodyParser.json());
 app.use(userRoutes);
 app.use(express.json()); // parse json bodies in the request object
 
+app.get("/healthz", (req, res) => {
+  res.status(200).json("OK");
+});
+
 db.connect((err) => {
   if (err) {
     throw err;
