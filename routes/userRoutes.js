@@ -186,7 +186,7 @@ Router.put('/v1/user/:userId', async (req, res) => {
         // Check if input payload contains any other fields than the editable fields
         const fields = req.body;
         for (const key in fields) {
-            if (key !== 'first_name' && key !== 'last_name' && key !== 'password' && key !== 'username') {
+            if (key !== 'first_name' && key !== 'last_name' && key !== 'password' ) {
                 return res.status(400).send({
                     error: 'Bad Request: Invalid field in request body'
                 });
@@ -195,7 +195,7 @@ Router.put('/v1/user/:userId', async (req, res) => {
         // Hash the password from the request body
         const hashPassword = await bcrypt.hash(req.body.password, saltRounds);
         // Validate required parameters
-        if (!req.body.first_name || !req.body.username || !req.body.password) {
+        if (!req.body.first_name || !req.body.last_name || !req.body.password) {
             return res.status(400).json({
                 error: 'Bad Request: Missing required parameters'
             });
