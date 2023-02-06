@@ -1,95 +1,125 @@
 const express = require("express");
 const app = express();
-
+const db = require('../models');
 const bcrypt = require("bcryptjs");
 const Router = express.Router();
 const mysql = require("mysql2");
 const db = require("../config/db");
-const basicAuth = require('basic-auth');
+const { BasicAuth } = require('../utils/auth');
 const saltRounds = 10;
 
-//basic auth
-
-//Endpoints for health status check
-Router.get("/", (req, res) => {
-    res.status(200).send();
-});
+//create main model
+const Product = db.products;
+const User = db.users;
 
 //Health check
 Router.get("/healthz", (req, res) => {
     res.status(200).send();
 });
 
-// Create a user
+// Create a new user - POST unauthenticated
 Router.post("/v1/user", async (req, res) => {
-    const {first_name,last_name,password,username} = req.body;
-    // Check if input payload contains any other fields than the editable fields
-    const fields = req.body;
-    for (const key in fields) {
-        if (key !== 'first_name' && key !== 'last_name' && key !== 'password' && key !== 'username') {
+    try{
+        const {first_name, last_name, username, password} = req.body;
+        if(!first_name || !last_name || !username || !password){
             return res.status(400).send({
-                error: 'Bad Request: Invalid field in request body'
+                error: 'Bad Request: Missing required fields'
             });
         }
-    }
-    //sanitise input
-    if (!/^[a-zA-Z]+$/.test(first_name)) {
-        console.log("first name should only contain alphabets");
-        return res.status(400).json({
-            error: "First name should only contain alphabets"
+        const hash = await bcrypt.hash(password, saltRounds);
+        const user = await User.create({
+            first_name: first_name,
+            last_name: last_name,
+            username: username,
+            password: hash,
+            account_created: new Date(),
+            account_updated: new Date()
         });
-    }
-
-
-    //check if username already exists
-    const sql = `SELECT * FROM users WHERE username = ?`;
-    const value = [username];
-    const results = await db.query(sql, value);
-    if (results[0].length > 0) {
-        return res.status(400).send({
-            error: 'Bad Request: Username already exists'
-        });
-    }
-
-    //check if password is valid
-    if (password.length < 8) {
-        return res.status(400).send({
-            error: 'Bad Request: Password must be at least 8 characters'
-        });
-    }
-
-    
-
-    //if user does not exist, create user
-    try {
-        let regex = new RegExp("[a-z0-9]+@[a-z]+.[a-z]{2,3}");
-        regex.test(req.body.username);
-        if (!regex.test(req.body.username)) {
-            return res.status(400).send({
-                error: 'Bad Request: Email address not valid'
-            });
-        }
-
-        const hashPassword2 = await bcrypt.hash(password, saltRounds);
-        const sql2 = `INSERT INTO users (first_name, last_name, password, username,account_created, account_updated) VALUES (?, ?, ?, ?, now(),now())`;
-        const value2 = [first_name, last_name, hashPassword2, username];
-        const results2 = await db.query(sql2, value2);
-        //retreive user id
-        const sql3 = `SELECT id, first_name, last_name,username, account_created, account_updated FROM users WHERE username = ?`;
-        const value3 = [username];
-        const results3 = await db.query(sql3, value3);
-        const user = results3[0];
-
-        return res.status(201).send(user);
-
-
+        res.status(201).send(user);
     } catch (err) {
-        console.log(err.sql);
-        return res.status(500).send({
-            error: 'Internal Server Error'
+        return res.status(400).send({
+            error: 'Bad Request: Invalid field in request body'
         });
     }
 });
+
+// Get a user - GET Authenticated
+Router.get("/v1/user/:userId", async (req, res) => {
+    try{
+        // Check for Authorization header
+        const {username, password} = basicAuth(req.headers.authorization);
+        // Select the user from the database with the given username
+        const user = await User.findOne({where: {username: username}});
+        // If the user is not found, return a 401 Unauthorized response
+        if (!user) return res.status(401).send({ error: 'Not authenticated 2' });
+        // If the user is found, compare the password in the request with the password in the database
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        // If the password does not match, return a 401 Unauthorized response
+        if (!passwordMatch) return res.status(401).send({ error: 'Not authenticated 1' });
+        
+        if (user.id !== parseInt(req.params.userId)) {//check if user id matches
+            return res.status(403).send({//if not, return 403 forbidden
+                error: 'Forbidden'
+            });
+        }
+        res.status(200).send(user);//if user id matches, return user
+    } catch (err) {
+        return res.status(401).send({ error: 'Not authenticated catch' });
+    }
+});
+
+// Update a user - PUT Authenticated
+
+Router.put("/v1/user/:userId", async (req, res) => {
+    try{
+        // Check for Authorization header
+        const {username, password} = basicAuth(req.headers.authorization);
+        // Select the user from the database with the given username
+        const user = await User.findOne({where: {username: username}});
+        // If the user is not found, return a 401 Unauthorized response
+        if (!user) return res.status(401).send({ error: 'Not authenticated 2' });
+        // If the user is found, compare the password in the request with the password in the database
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        // If the password does not match, return a 401 Unauthorized response
+        if (!passwordMatch) return res.status(401).send({ error: 'Not authenticated 1' });
+        
+        if (user.id !== parseInt(req.params.userId)) {//check if user id matches
+            return res.status(403).send({//if not, return 403 forbidden
+                error: 'Forbidden'
+            });
+        }
+        //check if all fields are present and there are no extra fields
+        if(Object.keys(req.body).length !== 3 || !req.body.first_name || !req.body.last_name || !req.body.password){
+            return res.status(400).send({
+                error: 'Bad Request: Missing required fields'
+            });
+        }
+
+        const {first_name, last_name, password} = req.body;
+        if(!first_name || !last_name || !username || !password){
+            return res.status(400).send({
+                error: 'Bad Request: Missing required fields'
+            });
+        }
+        const hash = await bcrypt.hash(password, saltRounds);
+        const user = await User.update({
+            first_name: first_name,
+            last_name: last_name,
+            username: username,
+            password: hash,
+            account_updated: new Date()
+        });
+        res.status(200).send(user);
+    }
+    catch (err) {
+        return res.status(400).send({
+            error: 'Bad Request: Invalid field in request body'
+        });
+    }
+});
+
+
+
 
 
 Router.get('/v1/user/:userId', async (req, res) => {
