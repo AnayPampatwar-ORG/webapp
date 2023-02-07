@@ -47,7 +47,7 @@ Router.post("/v1/user", async (req, res) => {
 Router.get("/v1/user/:userId", async (req, res) => {
     try{
         // Check for Authorization header
-        const {username, password} = basicAuth(req.headers.authorization);
+        const {username, password} = BasicAuth(req.headers.authorization);
         // Select the user from the database with the given username
         const user = await User.findOne({where: {username: username}});
         // If the user is not found, return a 401 Unauthorized response
@@ -73,13 +73,13 @@ Router.get("/v1/user/:userId", async (req, res) => {
 Router.put("/v1/user/:userId", async (req, res) => {
     try{
         // Check for Authorization header
-        const {username, password} = basicAuth(req.headers.authorization);
+        const {username, password1} = BasicAuth(req.headers.authorization);
         // Select the user from the database with the given username
         const user = await User.findOne({where: {username: username}});
         // If the user is not found, return a 401 Unauthorized response
         if (!user) return res.status(401).send({ error: 'Not authenticated 2' });
         // If the user is found, compare the password in the request with the password in the database
-        const passwordMatch = await bcrypt.compare(password, user.password);
+        const passwordMatch = await bcrypt.compare(password1, user.password);
         // If the password does not match, return a 401 Unauthorized response
         if (!passwordMatch) return res.status(401).send({ error: 'Not authenticated 1' });
         
@@ -96,20 +96,16 @@ Router.put("/v1/user/:userId", async (req, res) => {
         }
 
         const {first_name, last_name, password} = req.body;
-        if(!first_name || !last_name || !username || !password){
-            return res.status(400).send({
-                error: 'Bad Request: Missing required fields'
-            });
-        }
+        
         const hash = await bcrypt.hash(password, saltRounds);
-        const user = await User.update({
+        const user1 = await User.update({
             first_name: first_name,
             last_name: last_name,
             username: username,
             password: hash,
             account_updated: new Date()
         });
-        res.status(200).send(user);
+        res.status(200).send(user1);
     }
     catch (err) {
         return res.status(400).send({
