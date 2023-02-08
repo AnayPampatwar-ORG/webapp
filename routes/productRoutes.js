@@ -137,19 +137,22 @@ router.put('/v1/product/:productId', async (req, res) => {
 
         //check if sku already exists
         const skuexisting = await Product.findOne({where: {sku: req.body.sku}});
-        if (skuexisting && skuexisting.id !== req.params.productId) {
+    
+        if (skuexisting && skuexisting.id != req.params.productId) {
             console.log(skuexisting.id);
+            console.log(req.params.productId);
             return res.status(400).send({
                 error: 'Bad Request: SKU already extghbthbists'
             });
         }
 
-        //check if quantity is valid
-        if (req.body.quantity < 0 || req.body.quantity > 100) {
+        //check if quantity is valid and not a string type
+        if (req.body.quantity < 0 || req.body.quantity > 100 || typeof req.body.quantity !== 'number') {
             return res.status(400).send({
                 error: 'Bad Request: Quantity must be between 0 and 100'
             });
         }
+
 
         //if product does not exist, create product
         const {name, description, sku, manufacturer, quantity} = req.body;
@@ -160,7 +163,7 @@ router.put('/v1/product/:productId', async (req, res) => {
             manufacturer: manufacturer,
             quantity: quantity
         }, {where: {id: req.params.productId}});
-        res.status(201).send(product);
+        res.status(204).send({"message": "Product updated successfully"});
     } catch (err) {
         return res.status(401).send({ error: 'Not authenticated' });
 
