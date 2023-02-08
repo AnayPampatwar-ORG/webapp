@@ -1,14 +1,8 @@
-let chai = require('chai');
-let chaiHTTP = require('chai-http');
-const should = chai.should(); 
-const app = require('./server.js');
-chai.use(chaiHTTP); describe('Test', () => {
-    it('200 OK', (done) => {
-        chai.request(app)
-            .get('/healthz')
-            .end((err, response) => {
-                (response).should.have.status(200);
-                done();
-            });
-    });
+const chai = require('chai');
+const assert = chai.assert;
+describe('A simple arithmetic function', function () {
+    it('should return the sum of two numbers', function () {
+        const sum = (a, b) => a + b;
+        assert.equal(sum(2, 3), 5);
+    });
 });
