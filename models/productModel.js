@@ -29,8 +29,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0,
-            minimum: 0,
-            maximum: 100
+            validate:{
+                
+                min: 0,
+                max: 100
+            }
 
         },
         date_added: {
@@ -55,6 +58,6 @@ module.exports = (sequelize, DataTypes) => {
             // }
         }
 
-    });
+    }, {timestamps: false});
     return Product;
 }

@@ -42,6 +42,6 @@ module.exports = (sequelize, DataTypes) => {
     defaultValue: DataTypes.NOW,
     readOnly: true
   }
-    });
-    return Product;
+    }, {timestamps: false});
+    return User;
 }

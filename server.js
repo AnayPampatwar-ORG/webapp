@@ -22,6 +22,11 @@ app.get("/healthz", (req, res) => {
   res.status(200).send();
 });
 
+//global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(400).send("Bad Request!");
+});
 
 //import routes
 const userRoutes = require("./routes/userRoutes");

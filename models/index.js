@@ -1,4 +1,4 @@
-const dbConfig = require("../config/db.config.js");
+const dbConfig = require("../config/dbConfig.js");
 const {Sequelize, Datatypes} = require("sequelize");
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
@@ -33,6 +33,8 @@ db.users = require("./userModel.js")(sequelize, Sequelize);//sequelize is an ins
 db.products = require("./productModel.js")(sequelize, Sequelize);
 
 db.sequelize.sync({force: false })//{force: true} will drop the table if it already exists
+//{force: false} will not drop the table if it already exists and will create the table if it does not exist
+
 .then(() => {
     console.log("Drop and re-sync db.");
 }
