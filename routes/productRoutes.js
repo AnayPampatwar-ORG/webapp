@@ -167,6 +167,9 @@ router.put('/v1/product/:productId', async (req, res) => {
     }
 });
 
+
+//patch a product - PATCH Authenticated
+
 //delete a product - DELETE Authenticated
 router.delete('/v1/product/:productId', async (req, res) => {
     try{
