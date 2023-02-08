@@ -128,7 +128,6 @@ Router.get("/v1/user/:userId", async (req, res) => {
 Router.put("/v1/user/:userId", async (req, res) => {
     try{
         // Check for Authorization header
-
         const {username, password} = BasicAuth(req.headers.authorization);
         console.log(password);
         // Select the user from the database with the given username
@@ -147,53 +146,6 @@ Router.put("/v1/user/:userId", async (req, res) => {
         if (user.id !== parseInt(req.params.userId)) {//check if user id matches
             return res.status(403).send({//if not, return 403 forbidden
                 error: 'Forbidden'
-
-        const authHeader = req.header('Authorization');
-        if (!authHeader) {
-            return res.status(401).send({
-                error: 'Unauthorized: Missing authorization header'
-            });
-        }
-
-        // Decode the username and password from the Authorization header
-        const [username, password3] = Buffer.from(authHeader.split(' ')[1], 'base64')
-            .toString()
-            .split(':');
-
-        // Check if input payload contains any other fields than the editable fields
-        const fields = req.body;
-        for (const key in fields) {
-            if (key !== 'first_name' && key !== 'last_name' && key !== 'password' ) {
-                return res.status(400).send({
-                    error: 'Bad Request: Invalid field in request body'
-                });
-            }
-        }
-        // Hash the password from the request body
-        const hashPassword = await bcrypt.hash(req.body.password, saltRounds);
-        // Validate required parameters
-        if (!req.body.first_name || !req.body.last_name || !req.body.password) {
-            return res.status(400).json({
-                error: 'Bad Request: Missing required parameters'
-            });
-        }
-        // Retrieve the user from the database based on the username
-        const query = `SELECT * FROM users WHERE username = '${username}'`;
-        const results = await db.query(query);
-        if (results[0].length === 0) {
-            return res.status(401).send({
-                error: 'Unauthorized: Invalid username or password'
-            });
-        }
-        const rows = JSON.parse(JSON.stringify(results[0]));
-        const user = rows[0];
-
-        // Compare the password from the request with the password from the database
-        const isPasswordMatch = await bcrypt.compare(password3, hashPassword);
-        if (!isPasswordMatch) {
-            return res.status(401).send({
-                error: 'Unauthorized: Invalid username or password'
-
             });
         }
         //check if all fields are present and there are no extra fields
@@ -223,4 +175,5 @@ Router.put("/v1/user/:userId", async (req, res) => {
 });
 
 
+  
 module.exports = Router;
