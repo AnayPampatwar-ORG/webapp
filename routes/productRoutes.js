@@ -106,7 +106,7 @@ router.put('/v1/product/:productId', async (req, res) => {
         if (!passwordMatch) return res.status(401).send({ error: 'Not authenticated' });
         //check if request body contains any other fields than the editable fields
         const fields = req.body;
-        for (const key in fields) {
+        for(const key in fields) {
             if (key !== 'name' && key !== 'description' && key !== 'sku' && key !== 'manufacturer' && key !== 'quantity') {
                 return res.status(400).send({
                     error: 'Bad Request: Invalid field in request body'
@@ -130,8 +130,8 @@ router.put('/v1/product/:productId', async (req, res) => {
         //Only the user who added the product can update the product
         const product2 = await Product.findByPk(req.params.productId);
         if (product2.owner_user_id !== user.id) {
-            return res.status(401).send({
-                error: 'Not authorized'
+            return res.status(403).send({
+                error: 'Forbidden: Only the user who added the product can update the product'
             });
         }
 
@@ -142,7 +142,7 @@ router.put('/v1/product/:productId', async (req, res) => {
             console.log(skuexisting.id);
             console.log(req.params.productId);
             return res.status(400).send({
-                error: 'Bad Request: SKU already extghbthbists'
+                error: 'Bad Request: SKU already exists'
             });
         }
 
@@ -161,7 +161,8 @@ router.put('/v1/product/:productId', async (req, res) => {
             description: description,
             sku: sku,
             manufacturer: manufacturer,
-            quantity: quantity
+            quantity: quantity,
+            date_updated: new Date()
         }, {where: {id: req.params.productId}});
         res.status(204).send({"message": "Product updated successfully"});
     } catch (err) {
@@ -171,6 +172,90 @@ router.put('/v1/product/:productId', async (req, res) => {
 });
 
 //patch a product - PATCH Authenticated
+router.patch('/v1/product/:productId', async (req, res) => {
+    try{
+        const {username, password} = BasicAuth(req.headers.authorization);
+        const user = await User.findOne({where: {username: username}});
+        if (!user) return res.status(401).send({ error: 'Not authenticated1' });
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) return res.status(401).send({ error: 'Not authenticated2' });
+        console.log("here1");
+        //check if product exists
+        const product1 = await Product.findByPk(req.params.productId);
+        console.log("here2");
+        if (!product1) {
+            return res.status(404).send({
+                error: 'Not Found: Product does not exist'
+            });
+
+        }
+        console.log("here3");
+        //Only the user who added the product can update the product
+        const product2 = await Product.findByPk(req.params.productId);
+        if (product2.owner_user_id !== user.id) {
+            return res.status(403).send({
+                error: 'Forbidden: Only the user who added the product can update the product'
+            });
+        }
+        console.log("here4");
+        //check if request body contains any other fields than the editable fields
+        const fields = req.body;
+        for (const key in fields) {
+            if (key !== 'name' && key !== 'description' && key !== 'sku' && key !== 'manufacturer' && key !== 'quantity') {
+                return res.status(400).send({
+                    error: 'Bad Request: Invalid field in request body'
+                });
+            }
+        }
+        console.log("here5");
+        //check if req body contains at least one editable field
+        if (!req.body.name && !req.body.description && !req.body.sku && !req.body.manufacturer && !req.body.quantity) {
+            return res.status(400).send({
+                error: 'Bad Request: At least one field must be present in request body'
+            });
+        }
+        console.log("here6");
+
+        //check if request body contains sku
+        if (req.body.sku) {
+            //check if sku already exists
+            const skuexisting = await Product.findOne({where: {sku: req.body.sku}});
+            if (skuexisting && skuexisting.id != req.params.productId) {
+                return res.status(400).send({
+                    error: 'Bad Request: SKU already exists'
+                });
+            }
+        }
+        console.log("here7");
+
+        //check if request body contains quantity
+        if (req.body.quantity) {
+            //check if quantity is valid and not a string type
+            if (req.body.quantity < 0 || req.body.quantity > 100 || typeof req.body.quantity !== 'number') {
+                return res.status(400).send({
+                    error: 'Bad Request: Quantity must be between 0 and 100 and must be a number'
+                });
+            }
+        }
+
+        //if product does not exist, create product with only the fields that are present in the request body
+        console.log("here8");
+        const {name, description, sku, manufacturer, quantity} = req.body;
+        const product = await Product.update({
+            name: name || product1.name,//if name is not present in the request body, use the existing name
+            description: description || product1.description,
+            sku: sku || product1.sku,
+            manufacturer: manufacturer || product1.manufacturer,
+            quantity: quantity || product1.quantity,
+            date_updated:new Date()
+        },{where: {id: req.params.productId}});
+        res.status(204).send({"message": "Product updated successfully"});
+    } catch (err) {
+        return res.status(401).send(err);
+
+    }
+});
+
 
 
 //delete a product - DELETE Authenticated
@@ -181,6 +266,22 @@ router.delete('/v1/product/:productId', async (req, res) => {
         if (!user) return res.status(401).send({ error: 'Not authenticated 1' });
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) return res.status(401).send({ error: 'Not authenticated 2' });
+        //check if product exists
+        const product1 = await Product.findByPk(req.params.productId);
+        if (!product1) {
+            return res.status(404).send({
+                error: 'Not Found: Product does not exist'
+            });
+
+        }
+        //Only the user who added the product can delete the product
+        const product2 = await Product.findByPk(req.params.productId);
+        if (product2.owner_user_id !== user.id) {
+            return res.status(403).send({
+                error: 'Forbidden: Only the user who added the product can delete the product'
+            });
+        }
+        //delete product
         const product = await Product.destroy({where: {id: req.params.productId}});
         return res.status(204).send();
 

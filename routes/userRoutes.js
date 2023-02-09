@@ -91,12 +91,14 @@ Router.post("/v1/user", async (req, res) => {
 // Get a user - GET Authenticated
 Router.get("/v1/user/:userId", async (req, res) => {
     try{
+        //check if headers are present
+        if (!req.headers.authorization) return res.status(401).send({ error: 'Headers not present' });
         // Check for Authorization header
         const {username, password} = BasicAuth(req.headers.authorization);
         // Select the user from the database with the given username
         const user = await User.findOne({where: {username: username}});
         // If the user is not found, return a 401 Unauthorized response
-        if (!user) return res.status(401).send({ error: 'Not authenticated 2' });
+        if (!user) return res.status(401).send({ error: 'Not authenticated' });
         // If the user is found, compare the password in the request with the password in the database
         const passwordMatch = await bcrypt.compare(password, user.password);
         // If the password does not match, return a 401 Unauthorized response
@@ -119,7 +121,7 @@ Router.get("/v1/user/:userId", async (req, res) => {
 
 
     } catch (err) {
-        return res.status(401).send({ error: 'Not authenticated catch' });
+        return res.status(401).send({ error: 'Bad Request' });
     }
 });
 
@@ -129,20 +131,20 @@ Router.put("/v1/user/:userId", async (req, res) => {
     try{
         // Check for Authorization header
         const {username, password} = BasicAuth(req.headers.authorization);
-        console.log(password);
+        
         // Select the user from the database with the given username
-        console.log("here0")
+        
         const user = await User.findOne({where: {username: username}});
-        console.log("here00")
+        
         // If the user is not found, return a 401 Unauthorized response
-        if (!user) return res.status(401).send({ error: 'Not authenticated 2' });
-        console.log("here01")
+        if (!user) return res.status(401).send({ error: 'Not authenticated' });
+        
         // If the user is found, compare the password in the request with the password in the database
         const passwordMatch = await bcrypt.compare(password, user.password);
-        console.log("here2")
+        
         // If the password does not match, return a 401 Unauthorized response
-        if (!passwordMatch) return res.status(401).send({ error: 'Not authenticated 1' });
-        console.log("here3")
+        if (!passwordMatch) return res.status(401).send({ error: 'Not authenticated' });
+        
         if (user.id !== parseInt(req.params.userId)) {//check if user id matches
             return res.status(403).send({//if not, return 403 forbidden
                 error: 'Forbidden'
@@ -151,7 +153,7 @@ Router.put("/v1/user/:userId", async (req, res) => {
         //check if all fields are present and there are no extra fields
         if(Object.keys(req.body).length !== 3 || !req.body.first_name || !req.body.last_name || !req.body.password){
             return res.status(400).send({
-                error: 'Bad Request: Missing required fields 1'
+                error: 'Bad Request: Missing required fields'
             });
         }
 
@@ -170,7 +172,7 @@ Router.put("/v1/user/:userId", async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        return res.status(500).send(err);
+        return res.status(400).send(err);
     }
 });
 
