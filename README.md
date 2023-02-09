@@ -10,11 +10,11 @@
 - git checkout -b feature_x
 - git add -A :/
 - git commit -m "msg"
-- git push Anay feature_x
+- git push anay feature_x
 - Go to github and get pull request in organization
 - git checkout main
 - git pull upstream main
-- git push parth main/or go to your fork and click sync
+- git push anay main/or go to your fork and click sync
 - git checkout -b feature_y
 
 ### create a .env file with following details
@@ -58,3 +58,6 @@ DB_NAME = db_name
 
 ### Assignment 1
 - Develop a web application with RESTful API without any UI
+
+### Assignment 2
+- Make use of ORM Framework like Sequalize 
