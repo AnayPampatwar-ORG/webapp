@@ -26,7 +26,7 @@ DB_USER = root
 DB_PASSWORD = ""
 DB_NAME = db_name
 
-### To install dependencies and run project
+### To install dependencies and run project.
 - Install node
 - Run npm init --yes
 - Run npm i 
