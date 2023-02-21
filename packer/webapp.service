@@ -1,0 +1,14 @@
+[Unit]
+Description=Web App
+After=network.target
+
+[Service]
+WorkingDirectory=/home/ec2-user/webapp
+Environment=NODE_PORT=3001
+Type=simple
+ExecStart=/usr/bin/node /home/ec2-user/webapp/server.js
+Restart=on-Failure
+User=ec2-user
+
+[Install]
+WantedBy=multi-user.target
