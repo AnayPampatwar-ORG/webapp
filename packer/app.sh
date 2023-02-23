@@ -28,9 +28,12 @@ quit
 echo "success"
 
 # //go to webapp.zip
-sudo yum install unzip -y
-cd ~/ && unzip webapp.zip
-cd webapp
+sudo yum install unzip -y   
+mkdir ~/webapp
+unzip webapp.zip -d ~/webapp
+cd ~/webapp && npm i
+
+cd ~/webapp
 
 #set environment variables
 sudo touch .env

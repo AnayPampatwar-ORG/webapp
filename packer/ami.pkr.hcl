@@ -49,7 +49,7 @@ build {
 
 
   provisioner "file" {
-    source      = "./webapp.zip"
+    source      = "../app_artifact/webapp.zip"
     destination = "/home/ec2-user/webapp.zip"
   }
 
