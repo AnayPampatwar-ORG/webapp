@@ -24,8 +24,8 @@ locals {
 }
 
 source "amazon-ebs" "my-ami" {
-  ami_name = "csye-${local.timestamp}"
-  ami_users = ["649216824953","560592248581"]
+  ami_name  = "csye-${local.timestamp}"
+  ami_users = ["649216824953", "560592248581"]
 
   source_ami_filter {
     filters = {
@@ -40,8 +40,8 @@ source "amazon-ebs" "my-ami" {
 
 
   instance_type = "t2.micro"
-  region = var.aws_region
-  ssh_username = var.ssh_username
+  region        = var.aws_region
+  ssh_username  = var.ssh_username
 }
 
 build {
@@ -49,12 +49,12 @@ build {
 
 
   provisioner "file" {
-    source      = "./webapp.zip"
+    source      = "../app_artifact/webapp.zip"
     destination = "/home/ec2-user/webapp.zip"
   }
 
   provisioner "file" {
-    source      = "./webapp.service"  
+    source      = "./webapp.service"
     destination = "/tmp/webapp.service"
   }
 
