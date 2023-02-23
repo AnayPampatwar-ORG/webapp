@@ -27,6 +27,7 @@ jobs:
           mkdir app_artifact
           zip -r webapp . -x ".git/" ".github/" "node_modules/*" "package-lock.json"
           mv webapp.zip app_artifact
+
       - name: Validate Packer
         run: |
           cd packer
