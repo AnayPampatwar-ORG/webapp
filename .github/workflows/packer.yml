@@ -24,6 +24,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Zip folder creation
+        run: |
+          mkdir app_artifact
+          zip -r webapp . -x ".git/" ".github/" "node_modules/*" "package-lock.json"
+          mv webapp.zip app_artifact
+
       - name: Validate Template
         run: |
           cd packer
