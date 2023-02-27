@@ -31,6 +31,7 @@ db.sequelize = sequelize;//sequelize is an instance of Sequelize
 
 db.users = require("./userModel.js")(sequelize, Sequelize);//sequelize is an instance of Sequelize
 db.products = require("./productModel.js")(sequelize, Sequelize);
+db.images = require("./imageModel.js")(sequelize, Sequelize);
 
 db.sequelize.sync({force: false })//{force: true} will drop the table if it already exists
 //{force: false} will not drop the table if it already exists and will create the table if it does not exist
