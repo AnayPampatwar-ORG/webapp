@@ -13,11 +13,6 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
-variable "ami_users"{
-  type = list(string)
-  default = ["649216824953", "560592248581"]
-} 
-
 
 variable "ssh_username" {
   type    = string
@@ -30,7 +25,7 @@ locals {
 
 source "amazon-ebs" "my-ami" {
   ami_name  = "csye-${local.timestamp}"
-  ami_users = var.ami_users
+  ami_users = ["649216824953", "560592248581"]
 
   source_ami_filter {
     filters = {
@@ -54,7 +49,7 @@ build {
 
 
   provisioner "file" {
-    source      = "./app_artifact/webapp.zip"
+    source      = "../app_artifact/webapp.zip"
     destination = "/home/ec2-user/webapp.zip"
   }
 
