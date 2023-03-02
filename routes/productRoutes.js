@@ -6,11 +6,11 @@ const saltRounds = 10;
 const { BasicAuth } = require('../utils/auth');
 const {S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const s3 = new S3Client({
-    region: process.env.S3_REGION
-    // credentials: {
-    // accessKeyId: process.env.AWS_ACCESS_KEY,
-    // secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-    // }
+    region: process.env.S3_REGION,
+    credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }
 });
 
 
