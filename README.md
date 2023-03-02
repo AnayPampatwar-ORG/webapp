@@ -61,3 +61,6 @@ DB_NAME = db_name
 
 ### Assignment 2
 - Make use of ORM Framework like Sequalize 
+
+### Assignment 4
+- Use packer to create AMI 
