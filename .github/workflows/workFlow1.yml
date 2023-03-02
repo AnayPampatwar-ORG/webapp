@@ -29,6 +29,6 @@ jobs:
           mv webapp.zip app_artifact
       - name: Validate Packer
         run: |
-          cd packer
+          
           packer init ami.pkr.hcl
-          packer validate ami.pkr.hcl
+          packer validate .

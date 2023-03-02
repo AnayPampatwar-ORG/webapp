@@ -20,7 +20,7 @@ const randomName =(filename)=>{
     return `${randomName}.${extension}`;
 
 } 
-const {S3Client, PutObjectCommand} = require('@aws-sdk/client-s3');
+const {S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const auth = require('basic-auth');
 
 const s3 = new S3Client({
@@ -60,7 +60,7 @@ router.post("/v1/product/:productId/image",
             }
             const product = await Product.findOne({
                 where: {
-                    product_id: req.params.productId
+                    id: req.params.productId
                 }
             });
             if (!product) {
@@ -188,6 +188,12 @@ router.delete("/v1/product/:productId/image/:imageId", async (req, res) => {
             }
         });
         if (image) {
+
+            const params={
+                Bucket: process.env.S3_BUCKET,
+                Key: image.file_name
+            }
+            await s3.send(new DeleteObjectCommand(params));
             await image.destroy();
             res.status(200).send({
                 message: "Image deleted successfully"

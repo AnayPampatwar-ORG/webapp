@@ -7,7 +7,7 @@ WorkingDirectory=/home/ec2-user/webapp
 Environment=NODE_PORT=3001
 Type=simple
 ExecStart=/usr/bin/node /home/ec2-user/webapp/server.js
-Restart=on-Failure
+Restart=always
 User=ec2-user
 
 [Install]
