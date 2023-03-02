@@ -4,12 +4,20 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 const { BasicAuth } = require('../utils/auth');
-
+const {S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const s3 = new S3Client({
+    region: process.env.S3_REGION,
+    credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }
+});
 
 
 //create main model
 const Product = db.products;
 const User = db.users;
+const Image = db.images;
 
 //main work
 
@@ -281,11 +289,27 @@ router.delete('/v1/product/:productId', async (req, res) => {
                 error: 'Forbidden: Only the user who added the product can delete the product'
             });
         }
+
         //delete product
+
+        const images=await Image.findAll({where:{product_id:req.params.productId}});
+        if(images && images.length>0){
+            for(let i=0;i<images.length;i++){
+                const params = {
+                    Bucket: process.env.S3_BUCKET,
+                    Key: images[i].dataValues.s3_bucket_path.split("/").pop()
+                };
+                await s3.send(new DeleteObjectCommand(params));
+            }
+        await Image.destroy({where:{product_id:req.params.productId}});
+        }
+
+
         const product = await Product.destroy({where: {id: req.params.productId}});
         return res.status(204).send();
 
     } catch (err) {
+        console.log(err)
         return res.status(401).send({ error: 'Not authenticated 3' });
     }
 });

@@ -31,8 +31,10 @@ app.use((err, req, res, next) => {
 //import routes
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
+const imageRoutes = require("./routes/imageRoutes");
 app.use(userRoutes);
 app.use(productRoutes);
+app.use(imageRoutes);
 
 
 app.use((req, res) => {

@@ -19,13 +19,18 @@ variable "ssh_username" {
   default = "ec2-user"
 }
 
+variable "ami_users"{
+  type = list(string)
+  default = ["649216824953", "560592248581"]
+}
+
 locals {
   timestamp = regex_replace(timestamp(), "[- TZ:]", "")
 }
 
 source "amazon-ebs" "my-ami" {
   ami_name  = "csye-${local.timestamp}"
-  ami_users = ["649216824953", "560592248581"]
+  ami_users = var.ami_users
 
   source_ami_filter {
     filters = {
@@ -49,7 +54,7 @@ build {
 
 
   provisioner "file" {
-    source      = "../app_artifact/webapp.zip"
+    source      = "./app_artifact/webapp.zip"
     destination = "/home/ec2-user/webapp.zip"
   }
 
