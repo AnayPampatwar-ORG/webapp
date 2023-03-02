@@ -42,7 +42,8 @@ app.use((req, res) => {
 });
 
 // Listen on port
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
+console.log(process.env.DB_HOST);
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
 
 module.exports = app;
