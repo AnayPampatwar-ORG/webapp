@@ -32,6 +32,7 @@ jobs:
 
       - name: Validate Template
         run: |
-          packer init .
-          packer validate .
-          packer build .
+          cd packer
+          packer init ami.pkr.hcl
+          packer validate ami.pkr.hcl
+          packer build ami.pkr.hcl
