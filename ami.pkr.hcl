@@ -24,6 +24,11 @@ variable "ami_users" {
   default = ["649216824953", "560592248581"]
   }
 
+
+variable "ami_name" {
+  type    = string
+  default = "amzn2-ami-hvm-2.0.20210218.0-x86_64-gp2"
+}
 locals {
   timestamp = regex_replace(timestamp(), "[- TZ:]", "")
 }
@@ -35,7 +40,7 @@ source "amazon-ebs" "my-ami" {
 
   source_ami_filter {
     filters = {
-      name                = "amzn2-ami-hvm-2.*.1-x86_64-gp2"
+      name                = var.ami_name
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
