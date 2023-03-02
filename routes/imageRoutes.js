@@ -69,11 +69,10 @@ router.post("/v1/product/:productId/image",
             const image = await Image.create({
                 product_id: req.params.productId,
                 file_name: req.file.originalname,
-                s3_bucket_path: "s3://"+process.env.S3_BUCKET + '/' + randomName(req.file.originalname)
+                s3_bucket_path: "s3://"+process.env.S3_BUCKET + '/' + params.Key    
             });
+            console.log(image.dataValues.s3_bucket_path.split("/").pop())
             res.status(201).send(image);
-
-
 
 
         } catch(error) {
@@ -178,9 +177,22 @@ router.delete("/v1/product/:productId/image/:imageId", async (req, res) => {
 
             const params={
                 Bucket: process.env.S3_BUCKET,
-                Key: image.file_name
+                Key: image.dataValues.s3_bucket_path.split("/").pop()
             }
-            await s3.send(new DeleteObjectCommand(params));
+            console.log(image.dataValues.s3_bucket_path.split("/").pop())
+
+            try{
+
+                await s3.send(new DeleteObjectCommand(params));
+            }
+            catch(error){
+                console.log(error);
+                res.status(500).send({
+                    error: 'Internal Server Error 88' 
+                });
+            }
+
+            
             await image.destroy();
             res.status(200).send({
                 message: "Image deleted successfully"
@@ -198,9 +210,6 @@ router.delete("/v1/product/:productId/image/:imageId", async (req, res) => {
     }
 
 });
-
-
-
 
 
 
