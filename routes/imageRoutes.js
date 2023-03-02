@@ -4,14 +4,15 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const Crypto=require('crypto');
 const saltRounds = 10;
-const {
-    BasicAuth
-} = require('../utils/auth');
+const { BasicAuth } = require('../utils/auth');
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({
     storage: storage
 });
+const Product = db.products;
+const User = db.users;
+const Image = db.images;
 
 
 const randomName =(filename)=>{
@@ -31,9 +32,7 @@ const s3 = new S3Client({
     }
 });
 
-const Product = db.products;
-const User = db.users;
-const Image = db.images;
+
 
 
 router.post("/v1/product/:productId/image",
@@ -41,30 +40,18 @@ router.post("/v1/product/:productId/image",
     async (req, res) => {
         try {
             const {username, password} = BasicAuth(req.headers.authorization);
-            const user = await User.findOne({
-                where: {
-                    username: username
-                }
-            });
-            if (!user) {
-                res.status(401).send({
-                    error: 'Invalid username or password'
-                });
-            } else {
-                const validPassword = await bcrypt.compare(password, user.password);
-                if (!validPassword) {
-                    res.status(401).send({
-                        error: 'Invalid username or password'
-                    });
-                }
-            }
+        const user = await User.findOne({where: {username: username}});
+        if (!user) return res.status(401).send({ error: 'Not authenticated1' });
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) return res.status(401).send({ error: 'Not authenticated2' });
+        
             const product = await Product.findOne({
                 where: {
                     id: req.params.productId
                 }
             });
             if (!product) {
-                res.status(404).send({
+                return res.status(404).send({
                     error: 'Product not found'
                 });
             }
