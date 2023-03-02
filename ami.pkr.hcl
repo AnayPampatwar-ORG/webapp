@@ -13,22 +13,17 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
+variable "ami_users"{
+  type = list(string)
+  default = ["649216824953", "560592248581"]
+} 
+
 
 variable "ssh_username" {
   type    = string
   default = "ec2-user"
 }
 
-variable "ami_users" {
-  type    = list(string)
-  default = ["649216824953", "560592248581"]
-  }
-
-
-variable "ami_name" {
-  type    = string
-  default = "amzn2-ami-hvm-2.0.20210218.0-x86_64-gp2"
-}
 locals {
   timestamp = regex_replace(timestamp(), "[- TZ:]", "")
 }
@@ -36,11 +31,10 @@ locals {
 source "amazon-ebs" "my-ami" {
   ami_name  = "csye-${local.timestamp}"
   ami_users = var.ami_users
-  ami_description = "csye6225"
 
   source_ami_filter {
     filters = {
-      name                = var.ami_name
+      name                = "amzn2-ami-hvm-2.*.1-x86_64-gp2"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
