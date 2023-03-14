@@ -60,4 +60,4 @@ DB_NAME = db_name
 - Develop a web application with RESTful API without any UI
 
 ### Assignment 2
-- Make use of ORM Framework like Sequalize 
+- Make use of ORM Framework like Sequalize.
