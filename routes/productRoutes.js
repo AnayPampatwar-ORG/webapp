@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 const { BasicAuth } = require('../utils/auth');
 const {S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+
 const s3 = new S3Client({
     region: process.env.S3_REGION,
     // credentials: {
@@ -12,6 +13,12 @@ const s3 = new S3Client({
     // secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     // }
 });
+
+//statsd imports
+const logger = require('../config/logger');
+const StatsD = require('node-statsd');
+const statsd = new StatsD({ host: "localhost", port: 8125 });
+var start = new Date();
 
 
 //create main model
@@ -73,6 +80,7 @@ router.post('/v1/product', async (req, res) => {
             owner_user_id: user.id
 
         });
+        logger.info("product - POST - Product created");
         //return product id and sku
         return res.status(201).send({
             id: product.id,
@@ -87,7 +95,9 @@ router.post('/v1/product', async (req, res) => {
 
         });
     } catch (err) {
-        return res.status(401).send({ error: 'Not authenticated5' });
+        console.log(err);
+        logger.error(err);
+        return res.status(400).send("Bad Request");
 
     }
 });
@@ -98,9 +108,12 @@ router.get('/v1/product/:productId', async (req, res) => {
       const productId = req.params.productId;
       const product = await Product.findByPk(productId);
       if (!product) return res.status(404).send({ error: 'Product not found' });
+      logger.info("product - GET - Product found");
       return res.send(product);
     } catch (error) {
-      return res.status(500).send({ error: 'Internal server error' });
+        console.log(error);
+        logger.error(error);
+        return res.status(400).send("Bad Request");
     }
   });
 
@@ -172,9 +185,12 @@ router.put('/v1/product/:productId', async (req, res) => {
             quantity: quantity,
             date_updated: new Date()
         }, {where: {id: req.params.productId}});
+        logger.info("product - PUT - Product updated");
         res.status(204).send({"message": "Product updated successfully"});
     } catch (err) {
-        return res.status(401).send({ error: 'Not authenticated' });
+        console.log(err);
+        logger.error(err);
+        return res.status(400).send("Bad Request");
 
     }
 });
@@ -257,9 +273,12 @@ router.patch('/v1/product/:productId', async (req, res) => {
             quantity: quantity || product1.quantity,
             date_updated:new Date()
         },{where: {id: req.params.productId}});
+        logger.info("product - PATCH - Product updated");
         res.status(204).send({"message": "Product updated successfully"});
     } catch (err) {
-        return res.status(401).send(err);
+        console.log(err);
+        logger.error(err);
+        return res.status(400).send("Bad Request");
 
     }
 });
@@ -306,11 +325,13 @@ router.delete('/v1/product/:productId', async (req, res) => {
 
 
         const product = await Product.destroy({where: {id: req.params.productId}});
+        logger.info("product - DELETE - Product deleted");
         return res.status(204).send();
 
     } catch (err) {
         console.log(err)
-        return res.status(401).send({ error: 'Not authenticated 3' });
+        logger.error(err);
+        return res.status(400).send("Bad Request");
     }
 });
 
