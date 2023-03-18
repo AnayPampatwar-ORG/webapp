@@ -11,6 +11,12 @@ const saltRounds = 10;
 const Product = db.products;
 const User = db.users;
 
+//statsd imports
+const logger = require('../config/logger');
+const StatsD = require('node-statsd');
+const statsd = new StatsD({ host: "localhost", port: 8125 });
+var start = new Date();
+
 //Health check
 Router.get("/healthz", (req, res) => {
     res.status(200).send();
@@ -19,13 +25,14 @@ Router.get("/healthz", (req, res) => {
 // Create a new user - POST unauthenticated
 Router.post("/v1/user", async (req, res) => {
     try{
-        console.log("here1")
+        
         const {first_name, last_name, username, password} = req.body;
-        console.log("here2")
+        
         //check if request body contains any other fields than the editable fields
         const fields = req.body;
         for (const key in fields) {
             if (key !== 'first_name' && key !== 'last_name' && key !== 'username' && key !== 'password') {
+                logger.error("Bad Request - user - POST: Invalid field in request body other than 4");
                 return res.status(400).send({
                     error: 'Bad Request: Invalid field in request body other than 4'
                 });
@@ -33,14 +40,15 @@ Router.post("/v1/user", async (req, res) => {
         }
         //check if any required fields are missing
         if(!first_name || !last_name || !username || !password){
-            console.log("here4")
+            logger.error("Bad Request user - POST : Missing required fields");
             return res.status(400).send({
-                error: 'Bad Request: Missing required fields 1'
+                error: 'Bad Request: Missing required fields'
             });
         }
         //check if username already exists
         const userexisting = await User.findOne({where: {username: username}});
         if (userexisting) {
+            logger.error("Bad Request user - POST: Username already exists");
             return res.status(400).send({
                 error: 'Bad Request: Username already exists 1'
             });
@@ -63,7 +71,7 @@ Router.post("/v1/user", async (req, res) => {
         
         
         const hash = await bcrypt.hash(password, saltRounds);
-        console.log("here5")
+        
         const user = await User.create({
             first_name: first_name,
             last_name: last_name,
@@ -72,8 +80,9 @@ Router.post("/v1/user", async (req, res) => {
             account_created: new Date(),
             account_updated: new Date()
         });
-        console.log("here6")
+        
         //in response send user object without password field and return 201 Created response code
+        logger.info("Request Success user - POST: User created");
 
         res.status(201).send({
             id: user.id,
@@ -84,7 +93,9 @@ Router.post("/v1/user", async (req, res) => {
             account_updated: user.account_updated
         });
     } catch (err) {
-        return res.status(400).send({err});
+        console.log(err);
+        logger.error("Bad Request user - POST: " + err);
+        return res.status(400).send("Bad Request");
     }
 });
 
@@ -110,6 +121,7 @@ Router.get("/v1/user/:userId", async (req, res) => {
             });
         }
         //in response send user object without password field and return 200 OK response code 
+        logger.info("Request Success user - GET: User found");
         res.status(200).send({
             id: user.id,
             first_name: user.first_name,
@@ -121,7 +133,9 @@ Router.get("/v1/user/:userId", async (req, res) => {
 
 
     } catch (err) {
-        return res.status(401).send({ error: 'Bad Request' });
+        console.log(err);
+        logger.error("Bad Request user - GET: " + err);
+        return res.status(400).send({ error: 'Bad Request' });
     }
 });
 
@@ -168,11 +182,13 @@ Router.put("/v1/user/:userId", async (req, res) => {
             password: hash,
             account_updated: new Date() 
         },{where: {username: username}});
+        logger.info("Request Success user - PUT: User updated");
         res.status(204).send(user1);
     }
     catch (err) {
         console.log(err)
-        return res.status(400).send(err);
+        logger.error("Bad Request user - PUT: " + err);
+        return res.status(400).send("Bad Request");
     }
 });
 
