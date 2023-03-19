@@ -1,6 +1,14 @@
 #!/bin/bash
 sleep 30
-echo "Installing Nginx"
+
+#download cloudwatch agent rpm
+sudo wget https://s3.us-east-1.amazonaws.com/amazoncloudwatch-agent-us-east-1/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+#install cloudwatch agent
+sudo rpm -U ./amazon-cloudwatch-agent.rpm
+#check if cloudwatch agent is running
+sudo systemctl status amazon-cloudwatch-agent.service
+
+sleep 10
 sudo yum update -y
 sudo yum upgrade -y
 
