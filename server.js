@@ -8,7 +8,7 @@ app.use(cors());
 const logger = require("./config/logger");
 const StatsD = require("node-statsd");
 const statsd = new StatsD({ host: "localhost", port: 8125 });
-var start = new Date();
+
 
 const bodyParser = require("body-parser");
 //const userRoutes = require("./routes/userRoutes");
@@ -22,13 +22,12 @@ app.use(express.json()); // parse json bodies in the request object
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the application." });
   statsd.increment("endpoint.root");
-  statsd.timing("endpoint.root", new Date() - start);
+  
   logger.info("root - running fine");
 
 });
 app.get("/healthz", (req, res) => {
   statsd.increment("endpoint.healthz");
-  statsd.timing("endpoint.healthz", new Date() - start);
   logger.info("healthz - running fine");
   res.status(200).send();
 });
