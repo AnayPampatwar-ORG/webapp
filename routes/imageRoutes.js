@@ -94,6 +94,7 @@ router.post("/v1/product/:productId/image",
                 s3_bucket_path: "s3://" + process.env.S3_BUCKET + '/' + params.Key
             });
             logger.info("Image uploaded successfully");
+            statsd.increment("endpoint.image.post");
             console.log(image.dataValues.s3_bucket_path.split("/").pop())
             res.status(201).send(image);
 
@@ -127,6 +128,7 @@ router.get("/v1/product/:productId/image", async (req, res) => {
                     }
                 });
                 logger.info("Image fetched successfully");
+                statsd.increment("endpoint.image.get");
                 res.status(200).send(image);
             } else {
                 res.status(401).send({
@@ -180,6 +182,7 @@ router.get("/v1/product/:productId/image/:imageId", async (req, res) => {
             }
         });
         logger.info("Image fetched successfully");
+        statsd.increment("endpoint.image.get");
         res.status(200).send(image);
     } catch (error) {
         console.log(error);
@@ -218,6 +221,7 @@ router.delete("/v1/product/:productId/image/:imageId", async (req, res) => {
 
             await image.destroy();
             logger.info("Image deleted successfully");
+            statsd.increment("endpoint.image.delete");
             res.status(200).send({
                 message: "Image deleted successfully"
             });

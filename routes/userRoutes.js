@@ -25,7 +25,7 @@ Router.get("/healthz", (req, res) => {
 // Create a new user - POST unauthenticated
 Router.post("/v1/user", async (req, res) => {
     try{
-        
+        statsd.increment('endpoint.user.post');
         const {first_name, last_name, username, password} = req.body;
         
         //check if request body contains any other fields than the editable fields
@@ -54,7 +54,7 @@ Router.post("/v1/user", async (req, res) => {
             });
         }
 
-        console.log("here3")
+        
         //regex for email
         const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (!emailRegex.test(username)) {
@@ -83,6 +83,7 @@ Router.post("/v1/user", async (req, res) => {
         
         //in response send user object without password field and return 201 Created response code
         logger.info("Request Success user - POST: User created");
+        
 
         res.status(201).send({
             id: user.id,
@@ -102,6 +103,7 @@ Router.post("/v1/user", async (req, res) => {
 // Get a user - GET Authenticated
 Router.get("/v1/user/:userId", async (req, res) => {
     try{
+        statsd.increment('endpoint.user.get');
         //check if headers are present
         if (!req.headers.authorization) return res.status(401).send({ error: 'Headers not present' });
         // Check for Authorization header
@@ -122,6 +124,7 @@ Router.get("/v1/user/:userId", async (req, res) => {
         }
         //in response send user object without password field and return 200 OK response code 
         logger.info("Request Success user - GET: User found");
+        
         res.status(200).send({
             id: user.id,
             first_name: user.first_name,
@@ -143,6 +146,7 @@ Router.get("/v1/user/:userId", async (req, res) => {
 
 Router.put("/v1/user/:userId", async (req, res) => {
     try{
+        statsd.increment('endpoint.user.put');
         // Check for Authorization header
         const {username, password} = BasicAuth(req.headers.authorization);
         
@@ -183,6 +187,7 @@ Router.put("/v1/user/:userId", async (req, res) => {
             account_updated: new Date() 
         },{where: {username: username}});
         logger.info("Request Success user - PUT: User updated");
+        
         res.status(204).send(user1);
     }
     catch (err) {
