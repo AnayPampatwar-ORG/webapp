@@ -12,6 +12,11 @@ sudo wget https://s3.us-east-1.amazonaws.com/amazoncloudwatch-agent-us-east-1/am
 sudo rpm -U ./amazon-cloudwatch-agent.rpm
 #check if cloudwatch agent is running
 sudo systemctl status amazon-cloudwatch-agent.service
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+    -a fetch-config \
+    -m ec2 \
+    -c file:/home/ec2-user/webapp/statsd/config.json \
+    -s
 
 echo "Installing NodeJS"
 sudo yum install -y gcc-c++ make

@@ -17,10 +17,6 @@ const StatsD = require('node-statsd');
 const statsd = new StatsD({ host: "localhost", port: 8125 });
 var start = new Date();
 
-//Health check
-Router.get("/healthz", (req, res) => {
-    res.status(200).send();
-});
 
 // Create a new user - POST unauthenticated
 Router.post("/v1/user", async (req, res) => {
