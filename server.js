@@ -32,6 +32,12 @@ app.get("/healthz", (req, res) => {
   res.status(200).send();
 });
 
+app.get("/health123", (req, res) => {
+  statsd.increment("endpoint.healthz");
+  logger.info("healthz - running fine");
+  res.status(200).send();
+});
+
 //global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);

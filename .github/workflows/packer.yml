@@ -29,13 +29,11 @@ jobs:
           mkdir app_artifact
           zip -r webapp . -x ".git/" ".github/" "node_modules/*" "package-lock.json"
           mv webapp.zip app_artifact
-
       - name: Validate Template
         run: |
           packer init ami.pkr.hcl
           packer validate ami.pkr.hcl
           packer build ami.pkr.hcl
-
       - name: Retrive AMI ID
         run: |
           echo AMI_ID=$(jq -r '.builds[-1].artifact_id' ./manifest.json | cut -d ":" -f2) >> $GITHUB_ENV
@@ -50,7 +48,6 @@ jobs:
         run: |
           aws ec2 create-launch-template-version --launch-template-name launch-template-csye-6225 --source-version 1 --launch-template-data '{"ImageId":"${{ env.AMI_ID }}"}'
           echo "Launch template ID completed"
-
       - name: Instance refresh auto scale to use new launch template version
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEMO_AWS_ACCESS_KEY_ID }}
