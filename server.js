@@ -28,11 +28,13 @@ app.get("/", (req, res) => {
 });
 app.get("/healthz", (req, res) => {
   statsd.increment("endpoint.healthz");
+  res.json({ message: "Welcome to healthz." });
   logger.info("healthz - running fine");
   res.status(200).send();
 });
 
 app.get("/health123", (req, res) => {
+  res.json({ message: "Welcome to health123." });
   statsd.increment("endpoint.healthz");
   logger.info("healthz - running fine");
   res.status(200).send();

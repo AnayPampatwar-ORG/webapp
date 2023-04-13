@@ -45,7 +45,7 @@ const s3 = new S3Client({
 
 
 
-router.post("/v1/product/:productId/image",
+router.post("/v2/product/:productId/image",
     upload.single('img_name'),
     async (req, res) => {
         try {
@@ -108,7 +108,7 @@ router.post("/v1/product/:productId/image",
     });
 
 
-router.get("/v1/product/:productId/image", async (req, res) => {
+router.get("/v2/product/:productId/image", async (req, res) => {
     try {
         const {
             username,
@@ -151,7 +151,7 @@ router.get("/v1/product/:productId/image", async (req, res) => {
 
 });
 
-router.get("/v1/product/:productId/image/:imageId", async (req, res) => {
+router.get("/v2/product/:productId/image/:imageId", async (req, res) => {
 
     try {
         const {
@@ -192,7 +192,7 @@ router.get("/v1/product/:productId/image/:imageId", async (req, res) => {
 
 });
 
-router.delete("/v1/product/:productId/image/:imageId", async (req, res) => {
+router.delete("/v2/product/:productId/image/:imageId", async (req, res) => {
     try {
         const image = await Image.findOne({
             where: {

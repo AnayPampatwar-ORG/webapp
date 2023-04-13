@@ -19,7 +19,7 @@ var start = new Date();
 
 
 // Create a new user - POST unauthenticated
-Router.post("/v1/user", async (req, res) => {
+Router.post("/v2/user", async (req, res) => {
     try{
         statsd.increment('endpoint.user.post');
         const {first_name, last_name, username, password} = req.body;
@@ -97,7 +97,7 @@ Router.post("/v1/user", async (req, res) => {
 });
 
 // Get a user - GET Authenticated
-Router.get("/v1/user/:userId", async (req, res) => {
+Router.get("/v2/user/:userId", async (req, res) => {
     try{
         statsd.increment('endpoint.user.get');
         //check if headers are present
@@ -140,7 +140,7 @@ Router.get("/v1/user/:userId", async (req, res) => {
 
 // Update a user - PUT Authenticated
 
-Router.put("/v1/user/:userId", async (req, res) => {
+Router.put("/v2/user/:userId", async (req, res) => {
     try{
         statsd.increment('endpoint.user.put');
         // Check for Authorization header

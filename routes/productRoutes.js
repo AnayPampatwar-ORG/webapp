@@ -38,7 +38,7 @@ const Image = db.images;
 //main work
 
 //create a new product - POST Authenticated
-router.post('/v1/product', async (req, res) => {
+router.post('/v2/product', async (req, res) => {
     try {
         statsd.increment('endpoint.product.post');
         const {
@@ -134,7 +134,7 @@ router.post('/v1/product', async (req, res) => {
 });
 
 //get all products - GET Unauthenticated
-router.get('/v1/product/:productId', async (req, res) => {
+router.get('/v2/product/:productId', async (req, res) => {
     try {
         statsd.increment('endpoint.product.get');
         const productId = req.params.productId;
@@ -153,7 +153,7 @@ router.get('/v1/product/:productId', async (req, res) => {
 });
 
 //Put a product - PUT Authenticated
-router.put('/v1/product/:productId', async (req, res) => {
+router.put('/v2/product/:productId', async (req, res) => {
     try {
         statsd.increment('endpoint.product.put');
         const {
@@ -260,7 +260,7 @@ router.put('/v1/product/:productId', async (req, res) => {
 });
 
 //patch a product - PATCH Authenticated
-router.patch('/v1/product/:productId', async (req, res) => {
+router.patch('/v2/product/:productId', async (req, res) => {
     try {
         statsd.increment('endpoint.product.patch');
         const {
@@ -379,7 +379,7 @@ router.patch('/v1/product/:productId', async (req, res) => {
 
 
 //delete a product - DELETE Authenticated
-router.delete('/v1/product/:productId', async (req, res) => {
+router.delete('/v2/product/:productId', async (req, res) => {
     try {
         statsd.increment('endpoint.product.delete');
         const {
