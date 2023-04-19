@@ -38,7 +38,7 @@ const Image = db.images;
 //main work
 
 //create a new product - POST Authenticated
-router.post('/v2/product', async (req, res) => {
+router.post('/v5/product', async (req, res) => {
     try {
         statsd.increment('endpoint.product.post');
         const {
